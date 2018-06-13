@@ -1,0 +1,31 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: archive
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./mysql/volumes:/var/lib/mysql
+  web:
+    build: ./go
+    privileged: true
+    ports:
+      - "9000"
+      - "2345:2345"
+    links:
+      - db
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE
+  proxy:
+    build: ./proxy
+    ports:
+      - "80:80"
+    links:
+      - web
